@@ -1,0 +1,126 @@
+﻿@using Microsoft.AspNetCore.Http;
+@using Microsoft.AspNetCore.Http.Extensions;
+
+@{
+    ViewData["Title"] = "Chat Room";
+}
+
+<div class="container">
+    <div id="chat-box" class="mb-3"></div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            var $chatBox = $("#chat-box");
+            var $messageInput = $("#message-input");
+            var $sendButton = $("#send-button");
+
+            $messageInput.on("keypress", function (event) {
+                if (event.key === "Enter") {
+                    $sendButton.click();
+                    // Prevent line break in textarea
+                    event.preventDefault();
+                }
+            });
+
+            $sendButton.on("click", function () {
+                var div01 = uuidv4();
+                var div02 = uuidv4();
+                var message = $messageInput.val().trim();
+
+                // 输入内容
+                var titleElement01 = $("<div style='color: chocolate;'>").text("你:");
+                $chatBox.append(titleElement01);
+                var messageElement01 = $("<div id='" + div01 + "' style='color: chocolate;'>").text(message);
+                $chatBox.append(messageElement01);
+
+                // 回答
+                var titleElement02 = $("<div style='color: blue;'>").text("ChatGPT:");
+                $chatBox.append(titleElement02);
+
+                if (message !== "") {
+                    $messageInput.val("");
+                    // api调用
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("ChatWithGPT", "Home")",
+                        data: { input: message },
+                        success: function (data) {
+
+                            // 回答
+                            var messageElement02 = $("<div id='" + div02 + "' style='color: blue;'>").text(data.answer);
+                            $chatBox.append(messageElement02);
+
+                            $chatBox.append("<br/>");
+
+                            // Scroll to bottom
+                            $chatBox.scrollTop($chatBox[0].scrollHeight);
+                        },
+                        error: function () {
+                            alert("出现错误,请重试");
+                        }
+                    });
+                }
+            });
+
+
+            /*
+            // 打印字符的时间间隔（毫秒）
+            var interval = 100;
+
+            const textarea = document.querySelector('textarea');
+            textarea.addEventListener('input', autoResize);
+            function autoResize() {
+                this.style.height = 'auto'; // 重置高度为自动
+                this.style.height = `${this.scrollHeight}px`; // 设置新高度
+            }
+
+            // 开始打印字符串
+            function printString(str) {
+                var index = 0;
+                var timer = setInterval(function () {
+                    // 添加一个字符到显示栏
+                    var textContent = $("#outputBox").val();
+                    $("#outputBox").val(textContent + str[index]);
+                    index++;
+                    // 如果所有字符都打印完毕，则清除定时器
+                    if (index === str.length) {
+                        $("#outputBox").val($("#outputBox").val() + "\r\n");
+                        clearInterval(timer);
+                    }
+                }, interval);
+            }
+
+            $("#send-button").click(function () {
+                var inputText = $("#inputBox").val();
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ChatWithGPT", "Home")",
+                    data: { input: inputText },
+                    success: function (data) {
+                        $("#inputBox").val("");
+
+                        $("#outputBox").val("你:" + $("#outputBox").val() + data.question);
+
+                        $("#outputBox").val($("#outputBox").val() + "\r\n" + "ChatGPT:");
+                        printString(data.answer);
+                    },
+                    error: function () {
+                        alert("出现错误,请重试");
+                    }
+                });
+            });
+
+            */
+        });
+
+        function uuidv4() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+    </script>
+}

@@ -1,0 +1,10 @@
+services:
+
+- name: ui-chatroom
+  project: ../webApp/HomeChatGPT.csproj
+  env:
+    - name: ASPNETCORE_ENVIRONMENT
+      value: Development
+  bindings:
+    - port: 5220
+      protocol: http
