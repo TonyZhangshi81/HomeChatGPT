@@ -1,4 +1,4 @@
-using HomeChatGPT.Configuration;
+ï»¿using HomeChatGPT.Configuration;
 using HomeChatGPT.Utils;
 using Spectre.Console;
 using System.Data;
@@ -10,8 +10,10 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ´òÓ¡²ÎÊı±E
 WriteParameterTable();
+
+// é…ç½®é…ç½®æ–‡ä»¶
+ConfigureConfiguration();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -36,7 +38,7 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 #pragma warning disable ASP0014
-// ÅäÖÃ¶Ëµã£¬ÅäÖÃEndpoints.FilmHouseEndpoints
+// é…ç½®ç«¯ç‚¹ï¼Œé…ç½®Endpoints.FilmHouseEndpoints
 app.UseEndpoints(ConfigureEndpoints.FilmHouseEndpoints);
 #pragma warning restore ASP0014
 
@@ -44,36 +46,49 @@ app.Run();
 
 
 
+void ConfigureConfiguration()
+{
+    // åˆ›å»ºä¸€ä¸ªæ–°çš„é…ç½®æ„å»ºå™¨ï¼Œå¹¶æ·»åŠ ä¸‰ä¸ªJSONæ–‡ä»¶
+    IConfiguration configuration = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json")
+        .AddJsonFile("appsettings.Development.json")
+        .AddEnvironmentVariables("openai_")
+        .Build();
+    // å°†é…ç½®æ·»åŠ åˆ°æœåŠ¡ä¸­
+    builder.Services.AddSingleton<IConfiguration>(configuration);
+}
+
+
 void WriteParameterTable()
 {
-    // »ñÈ¡Ó¦ÓÃ³ÌĞò°æ±¾
+    // è·å–åº”ç”¨ç¨‹åºç‰ˆæœ¬
     var appVersion = Helper.AppVersion;
-    // ´´½¨Ò»¸ö±úÔñ£¬±EâÎªFilmHouse.WebºÍ.NET°æ±¾
+    // åˆ›å»ºä¸€ä¸ªæŸ„æ‹©ï¼Œçœ®Eé¦•ç‹¥ilmHouse.Webå’Œ.NETç‰ˆæœ¬
     var table = new Spectre.Console.Table
     {
         Title = new($"FilmHouse.Web {appVersion} | .NET {Environment.Version}")
     };
 
-    // »ñÈ¡Ö÷»úÃE
+    // è·å–ä¸»æœºå
     var strHostName = Dns.GetHostName();
-    // »ñÈ¡Ö÷»úĞÅÏ¢
+    // è·å–ä¸»æœºä¿¡æ¯
     var ipEntry = Dns.GetHostEntry(strHostName);
-    // »ñÈ¡IPµØÖ·ÁĞ±E
+    // è·å–IPåœ°å€åˆ—
     var ips = ipEntry.AddressList;
 
     table.AddColumn("Parameter");
     table.AddColumn("Value");
-    // ÌúØÓµ±Ç°Â·¾¶
+    // å½“å‰è·¯å¾„
     table.AddRow(new Spectre.Console.Markup("[blue]Path[/]"), new Spectre.Console.Text(Environment.CurrentDirectory));
-    // ÌúØÓ²Ù×÷ÏµÍ³ĞÅÏ¢
+    // ä½œç³»ç»Ÿä¿¡æ¯
     table.AddRow(new Spectre.Console.Markup("[blue]System[/]"), new Spectre.Console.Text(Helper.TryGetFullOSVersion()));
-    // ÌúØÓµ±Ç°ÓÃ»§ĞÅÏ¢
+    // å½“å‰ç”¨æˆ·ä¿¡æ¯
     table.AddRow(new Spectre.Console.Markup("[blue]User[/]"), new Spectre.Console.Text(Environment.UserName));
-    // ÌúØÓÖ÷»úÃE
+    // ä¸»æœºå
     table.AddRow(new Spectre.Console.Markup("[blue]Host[/]"), new Spectre.Console.Text(Environment.MachineName));
-    // ÌúØÓIPµØÖ·
+    // IPåœ°å€
     table.AddRow(new Spectre.Console.Markup("[blue]IP addresses[/]"), new Spectre.Console.Rows(ips.Select(p => new Spectre.Console.Text(p.ToString()))));
-    // ÌúØÓ±à¼­ÆE
+    // 
     table.AddRow(new Spectre.Console.Markup("[blue]Editor[/]"), new Spectre.Console.Text(builder.Configuration["Editor"]!));
 
     AnsiConsole.Write(table);

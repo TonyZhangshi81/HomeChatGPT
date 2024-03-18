@@ -1,4 +1,6 @@
 ﻿using HomeChatGPT.Utils;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -7,10 +9,18 @@ namespace HomeChatGPT.Controllers
     public class HomeController : Controller
     {
         private readonly IConfiguration _configuration;
+        private readonly string _apiKey;
 
         public HomeController(IConfiguration configuration)
         {
             this._configuration = configuration;
+
+            var collections = _configuration.AsEnumerable();
+
+            if (collections.Any())
+            {
+                this._apiKey = collections.ElementAt(0).Value;
+            }
         }
 
         public IActionResult Index()
@@ -34,8 +44,7 @@ namespace HomeChatGPT.Controllers
 
         private async Task<(string question, string answer)> CallChatGPTAPI(string input)
         {
-            var apiKey = this._configuration.GetValue<string>("ApiKey");
-            var chatGPTApiClient = new ChatGPTApiClient(Helper.DecryptBase64(apiKey));
+            var chatGPTApiClient = new ChatGPTApiClient(this._apiKey);
 
             string responseData = await chatGPTApiClient.ChatAsync(input);
             //Console.WriteLine(responseData);
