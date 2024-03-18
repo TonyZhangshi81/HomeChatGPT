@@ -35,7 +35,7 @@ namespace HomeChatGPT.Controllers
         private async Task<(string question, string answer)> CallChatGPTAPI(string input)
         {
             var apiKey = this._configuration.GetValue<string>("ApiKey");
-            var chatGPTApiClient = new ChatGPTApiClient(apiKey!);
+            var chatGPTApiClient = new ChatGPTApiClient(Helper.DecryptBase64(apiKey));
 
             string responseData = await chatGPTApiClient.ChatAsync(input);
             //Console.WriteLine(responseData);

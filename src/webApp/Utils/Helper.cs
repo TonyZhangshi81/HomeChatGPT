@@ -339,5 +339,21 @@ namespace HomeChatGPT.Utils
             { "#", "sharp" },
             { " ", "-" }
         };
+
+
+
+        public static string EncryptBase64(string input)
+        {
+            byte[] bytes = Encoding.UTF8.GetBytes(input);
+            string base64Encoded = Convert.ToBase64String(bytes);
+            return base64Encoded;
+        }
+
+        public static string DecryptBase64(string input)
+        {
+            byte[] bytes = Convert.FromBase64String(input);
+            string decodedString = Encoding.UTF8.GetString(bytes);
+            return decodedString;
+        }
     }
 }

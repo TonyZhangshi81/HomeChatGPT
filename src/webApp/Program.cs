@@ -10,7 +10,7 @@ Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 打印参数表
+// 打印参数眮E
 WriteParameterTable();
 
 // Add services to the container.
@@ -48,32 +48,32 @@ void WriteParameterTable()
 {
     // 获取应用程序版本
     var appVersion = Helper.AppVersion;
-    // 创建一个表格，标题为FilmHouse.Web和.NET版本
+    // 创建一个柄择，眮E馕狥ilmHouse.Web和.NET版本
     var table = new Spectre.Console.Table
     {
         Title = new($"FilmHouse.Web {appVersion} | .NET {Environment.Version}")
     };
 
-    // 获取主机名
+    // 获取主机脕E
     var strHostName = Dns.GetHostName();
     // 获取主机信息
     var ipEntry = Dns.GetHostEntry(strHostName);
-    // 获取IP地址列表
+    // 获取IP地址列眮E
     var ips = ipEntry.AddressList;
 
     table.AddColumn("Parameter");
     table.AddColumn("Value");
-    // 添加当前路径
+    // 铁赜当前路径
     table.AddRow(new Spectre.Console.Markup("[blue]Path[/]"), new Spectre.Console.Text(Environment.CurrentDirectory));
-    // 添加操作系统信息
+    // 铁赜操作系统信息
     table.AddRow(new Spectre.Console.Markup("[blue]System[/]"), new Spectre.Console.Text(Helper.TryGetFullOSVersion()));
-    // 添加当前用户信息
+    // 铁赜当前用户信息
     table.AddRow(new Spectre.Console.Markup("[blue]User[/]"), new Spectre.Console.Text(Environment.UserName));
-    // 添加主机名
+    // 铁赜主机脕E
     table.AddRow(new Spectre.Console.Markup("[blue]Host[/]"), new Spectre.Console.Text(Environment.MachineName));
-    // 添加IP地址
+    // 铁赜IP地址
     table.AddRow(new Spectre.Console.Markup("[blue]IP addresses[/]"), new Spectre.Console.Rows(ips.Select(p => new Spectre.Console.Text(p.ToString()))));
-    // 添加编辑器
+    // 铁赜编辑苼E
     table.AddRow(new Spectre.Console.Markup("[blue]Editor[/]"), new Spectre.Console.Text(builder.Configuration["Editor"]!));
 
     AnsiConsole.Write(table);
