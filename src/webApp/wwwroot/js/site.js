@@ -16,6 +16,12 @@
     }
   });
 
+  // 阻止浏览器默认的下拉刷新行为
+  document.addEventListener('touchmove', function (event) {
+    event.preventDefault();
+  }, { passive: false });
+
+
   $sendButton.on("click", function () {
     var message = $messageInput.val().trim();
 
@@ -65,7 +71,7 @@
           const $msgContent = $('<div>', { class: 'img_cont_msg' });
           const $avatar = $('<img>', { src: answerData.avatarSrc, class: 'rounded-circle user_img_msg' });
           const $imgContainer = $('<div>', { class: 'msg_cotainer' });
-          const $message = $('<span>').text(answerData.content);
+          const $message = $('<span>').text('');
           const $time = $('<span>', { class: 'msg_time' }).text(answerData.time);
 
           // 应答信息显示
@@ -78,6 +84,9 @@
           // 滚动条移动至最后位置
           $chatBox.scrollTop($chatBox[0].scrollHeight);
 
+          // 文字打印
+          printString(answerData.content, $message, $chatBox);
+
         },
         error: function () {
           alert("出现错误,请重试");
@@ -89,3 +98,24 @@
 
 });
 
+// 开始打印字符串
+function printString(content, $message, $chatBox) {
+  // 打印字符的时间间隔（毫秒）
+  var interval = 80;
+
+  var index = 0;
+  var timer = setInterval(function () {
+    // 添加一个字符到显示栏
+    var tmp = $message.text();
+    $message.text(tmp + content[index]);
+    index++;
+    // 滚动条移动至最后位置
+    $chatBox.scrollTop($chatBox[0].scrollHeight);
+
+    // 如果所有字符都打印完毕，则清除定时器
+    if (index === content.length) {
+      clearInterval(timer);
+    }
+  }, interval);
+
+}
