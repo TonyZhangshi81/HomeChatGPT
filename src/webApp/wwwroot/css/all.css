@@ -12,7 +12,8 @@
 }
 
 .card {
-    height: 500px;
+    /*height: 100%;*/
+    height: 100vh;
     border-radius: 15px !important;
     background-color: rgba(0,0,0,0.4) !important;
 }
@@ -252,6 +253,11 @@
                 cursor: pointer;
                 background-color: rgba(0,0,0,0.2);
             }
+
+.input-group-text {
+    height: 60px;
+}
+
 
 @media(max-width: 576px) {
     .contacts_card {
