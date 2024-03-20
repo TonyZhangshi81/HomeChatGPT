@@ -10,12 +10,31 @@
   var $sendButton = $("#send-button");
   var $icon = $('#onlineStatus');
 
+  // 调整页面高度
+  adjustDivHeight();
+
   // 监听窗口大小变化以重新计算[card]的显示高度
   window.addEventListener('resize', adjustDivHeight);
+  // 调整页面高度的函数
   function adjustDivHeight() {
     var $card = $(".card");
-    $card.attr("height", window.innerHeight + 'px');
+    var screenHeight = window.innerHeight;          // 获取屏幕高度
+    var contentHeight = document.body.scrollHeight; // 获取页面内容高度
+    $card.height(620);
   }
+
+  $messageInput.on('focusin focusout', function (event) {
+    if (event.type === 'focusin') {
+      // 保存当前滚动位置
+      //originalScrollTop = $(window).scrollTop();
+      // 执行输入法面板弹出时的操作
+    } else {
+      // 执行输入法面板隐藏时的操作
+      $('html, body').animate({ scrollTop: 0 }, 80);
+
+      adjustDivHeight();
+    }
+  });
 
   // 按键触发监听
   $messageInput.on("keypress", function (event) {
@@ -121,8 +140,8 @@
   // api连接测试
   testCall();
 
-  // 每 2 分钟检测api连接状态
-  setInterval(testCall, 20000);
+  // 每 5 分钟检测api连接状态
+  setInterval(testCall, 50000);
 
 });
 
