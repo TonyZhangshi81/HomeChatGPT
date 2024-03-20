@@ -1,11 +1,10 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
-using ChatGPT.Net.DTO;
-using ChatGPT.Net.DTO.ChatGPT;
+﻿using ChatGPT.Net.DTO.ChatGPT;
 using ChatGPT.Net.DTO.ChatGPTUnofficial;
 using Newtonsoft.Json;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Security.Principal;
 
 namespace ChatGPT.Net;
 
@@ -56,13 +55,13 @@ public class ChatGpt
             Content = message
         });
     }
-    
+
     public void RemoveConversationSystemMessages(string conversationId, string message)
     {
         var conversation = GetConversation(conversationId);
         conversation.Messages = conversation.Messages.Where(x => x.Role != "system").ToList();
     }
-    
+
     public List<ChatGptConversation> GetConversations()
     {
         return Conversations;
@@ -91,7 +90,7 @@ public class ChatGpt
 
         return conversation;
     }
-    
+
     public void SetConversation(string conversationId, ChatGptConversation conversation)
     {
         var conv = Conversations.FirstOrDefault(x => x.Id == conversationId);
@@ -105,7 +104,7 @@ public class ChatGpt
             Conversations.Add(conversation);
         }
     }
-    
+
     public void RemoveConversation(string conversationId)
     {
         var conversation = Conversations.FirstOrDefault(x => x.Id == conversationId);
@@ -138,7 +137,7 @@ public class ChatGpt
             Role = "user",
             Content = prompt
         });
-        
+
         var reply = await SendMessage(new ChatGptRequest
         {
             Messages = conversation.Messages,
@@ -151,7 +150,7 @@ public class ChatGpt
             Stop = Config.Stop,
             MaxTokens = Config.MaxTokens,
         });
-        
+
         conversation.Updated = DateTime.Now;
 
         var response = reply.Choices.FirstOrDefault()?.Message.Content ?? "";
@@ -192,11 +191,36 @@ public class ChatGpt
             if (content is null) return;
             if (!string.IsNullOrWhiteSpace(content)) callback(content);
         });
-        
+
         conversation.Updated = DateTime.Now;
 
         return reply.Choices.FirstOrDefault()?.Message.Content ?? "";
     }
+
+    /// <summary>
+    /// openai api 通讯测试
+    /// </summary>
+    /// <returns></returns>
+    public async Task<HttpStatusCode> TryAsk()
+    {
+        var client = new HttpClient();
+        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {APIKey}");
+
+        try
+        {
+            var response = await client.GetAsync($"{Config.BaseUrl}/v1/engines");
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("OpenAI API communication is successful.");
+            }
+            return response.StatusCode;
+        }
+        catch (Exception ex)
+        {
+            return HttpStatusCode.BadGateway;
+        }
+    }
+
 
     public async Task<ChatGptResponse> SendMessage(ChatGptRequest requestBody, Action<ChatGptStreamChunkResponse>? callback = null)
     {
@@ -218,7 +242,7 @@ public class ChatGpt
             }
         };
 
-        var response = await client.SendAsync(request,HttpCompletionOption.ResponseHeadersRead);
+        var response = await client.SendAsync(request, HttpCompletionOption.ResponseHeadersRead);
 
         response.EnsureSuccessStatusCode();
 
@@ -232,20 +256,20 @@ public class ChatGpt
             }
 
             var concatMessages = string.Empty;
-            
+
             ChatGptStreamChunkResponse? reply = null;
             var stream = await response.Content.ReadAsStreamAsync();
             await foreach (var data in StreamCompletion(stream))
             {
                 var jsonString = data.Replace("data: ", "");
                 if (string.IsNullOrWhiteSpace(jsonString)) continue;
-                if(jsonString == "[DONE]") break;
+                if (jsonString == "[DONE]") break;
                 reply = JsonConvert.DeserializeObject<ChatGptStreamChunkResponse>(jsonString);
                 if (reply is null) continue;
                 concatMessages += reply.Choices.FirstOrDefault()?.Delta.Content;
                 callback?.Invoke(reply);
             }
-            
+
             return new ChatGptResponse
             {
                 Id = reply?.Id ?? Guid.NewGuid().ToString(),
@@ -265,8 +289,8 @@ public class ChatGpt
         }
 
         var content = await response.Content.ReadFromJsonAsync<ChatGptResponse>();
-        if(content is null) throw new Exception("Unknown error");
-        if(content.Error is not null) throw new Exception(content.Error.Message);
+        if (content is null) throw new Exception("Unknown error");
+        if (content.Error is not null) throw new Exception(content.Error.Message);
         return content;
     }
 }

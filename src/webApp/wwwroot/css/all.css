@@ -13,7 +13,12 @@
 }
 
 .card {
-    height: 600px;
+    /*height: 600px;*/
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 15px;
+    right: 15px;
     border-radius: 15px !important;
     background-color: rgba(0,0,0,0.4) !important;
 }
@@ -141,7 +146,14 @@
 }
 
 .offline {
-    background-color: #c23616 !important;
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    background-color: darkgray;
+    border-radius: 50%;
+    bottom: 0.2em;
+    right: 0.4em;
+    border: 1.5px solid white;
 }
 
 .user_info {

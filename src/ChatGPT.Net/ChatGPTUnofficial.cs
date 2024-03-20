@@ -1,11 +1,10 @@
-﻿using System.Net.Http.Headers;
+﻿using ChatGPT.Net.DTO;
+using ChatGPT.Net.DTO.ChatGPTUnofficial;
+using Newtonsoft.Json;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
-using ChatGPT.Net.DTO;
-using ChatGPT.Net.DTO.ChatGPT;
-using ChatGPT.Net.DTO.ChatGPTUnofficial;
-using Newtonsoft.Json;
 
 namespace ChatGPT.Net;
 
@@ -56,7 +55,7 @@ public class ChatGptUnofficial
 
         if (content is not null)
         {
-            if(content.Error is null) AccessToken = content.AccessToken;
+            if (content.Error is null) AccessToken = content.AccessToken;
         }
     }
 
@@ -101,7 +100,7 @@ public class ChatGptUnofficial
 
         return conversation;
     }
-    
+
     public void SetConversation(string conversationId, ChatGptUnofficialConversation conversation)
     {
         var conv = Conversations.FirstOrDefault(x => x.Id == conversationId);
@@ -115,7 +114,7 @@ public class ChatGptUnofficial
             Conversations.Add(conversation);
         }
     }
-    
+
     public void RemoveConversation(string conversationId)
     {
         var conversation = Conversations.FirstOrDefault(x => x.Id == conversationId);
@@ -146,12 +145,12 @@ public class ChatGptUnofficial
 
         var reply = await SendMessage(prompt, Guid.NewGuid().ToString(), conversation.ParentMessageId, conversation.ConversationId, Config.Model);
 
-        if(reply.ConversationId is not null)
+        if (reply.ConversationId is not null)
         {
             conversation.ConversationId = reply.ConversationId;
         }
 
-        if(reply.Message.Id is not null)
+        if (reply.Message.Id is not null)
         {
             conversation.ParentMessageId = reply.Message.Id;
         }
@@ -172,12 +171,12 @@ public class ChatGptUnofficial
                 if (content is not null) callback(content);
             });
 
-        if(reply.ConversationId is not null)
+        if (reply.ConversationId is not null)
         {
             conversation.ConversationId = reply.ConversationId;
         }
 
-        if(reply.Message.Id is not null)
+        if (reply.Message.Id is not null)
         {
             conversation.ParentMessageId = reply.Message.Id;
         }
@@ -187,16 +186,19 @@ public class ChatGptUnofficial
         return reply.Message.Content.Parts.FirstOrDefault() ?? "";
     }
 
-    private bool ValidateToken(string token) {
-        if (string.IsNullOrWhiteSpace(token)) {
+    private bool ValidateToken(string token)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+        {
             return false;
         }
-    
+
         var tokenParts = token.Split('.');
-        if (tokenParts.Length != 3) {
+        if (tokenParts.Length != 3)
+        {
             return false;
         }
-        
+
         //Ensure the string length is a multiple of 4
         var tokenPart = tokenParts[1];
         var remainderLength = tokenPart.Length % 4;
@@ -205,13 +207,13 @@ public class ChatGptUnofficial
 
         var decodedPayload = Encoding.UTF8.GetString(Convert.FromBase64String(tokenPart));
         var parsed = JsonDocument.Parse(decodedPayload).RootElement;
-    
+
         return DateTimeOffset.Now.ToUnixTimeMilliseconds() <= parsed.GetProperty("exp").GetInt64() * 1000;
     }
 
     public async Task<ChatGptUnofficialMessageResponse> SendMessage(string message, string messageId, string? parentMessageId = null, string? conversationId = null, string? model = null, Action<ChatGptUnofficialMessageResponse>? callback = null)
     {
-        if(!ValidateToken(AccessToken)) await RefreshAccessToken();
+        if (!ValidateToken(AccessToken)) await RefreshAccessToken();
         var requestData = new ChatGptUnofficialMessageRequest
         {
             Messages = new List<MessageElement>
@@ -228,17 +230,17 @@ public class ChatGptUnofficial
                 }
             }
         };
- 
+
         if (model is not null)
         {
             requestData.Model = model;
         }
- 
+
         if (conversationId is not null)
         {
             requestData.ConversationId = conversationId;
         }
-        
+
         if (parentMessageId is not null)
         {
             requestData.ParentMessageId = parentMessageId;
@@ -267,7 +269,7 @@ public class ChatGptUnofficial
         response.EnsureSuccessStatusCode();
 
         var stream = await response.Content.ReadAsStreamAsync();
-        
+
         ChatGptUnofficialMessageResponse? reply = null;
 
         await foreach (var data in StreamCompletion(stream))

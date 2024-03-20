@@ -1,6 +1,4 @@
 ﻿using HomeChatGPT.Utils;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -35,19 +33,27 @@ namespace HomeChatGPT.Controllers
             (string question, string answer) data = await CallChatGPTAPI(input);
 
             var responseObject = new { question = data.question, answer = data.answer };
-            // 将对象序列化为JSON字符串
-            string jsonResponse = JsonConvert.SerializeObject(responseObject);
-
-            // 返回JSON响应
+            var jsonResponse = JsonConvert.SerializeObject(responseObject);
             return Content(jsonResponse, "application/json");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> TryGPT()
+        {
+            var chatGPTApiClient = new ChatGPTApiClient(this._apiKey);
+            var statusCode = await chatGPTApiClient.TryAskAsync();
+
+            var responseObject = new { statusCode = (int)statusCode };
+            return Content(JsonConvert.SerializeObject(responseObject), "application/json");
+        }
+
+
 
         private async Task<(string question, string answer)> CallChatGPTAPI(string input)
         {
             var chatGPTApiClient = new ChatGPTApiClient(this._apiKey);
 
             string responseData = await chatGPTApiClient.ChatAsync(input);
-            //Console.WriteLine(responseData);
 
             string question = input;
             string answer = responseData;

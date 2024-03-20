@@ -8,11 +8,28 @@
   var $chatBox = $(".card-body");
   var $messageInput = $("#message-input");
   var $sendButton = $("#send-button");
+  var $icon = $('#onlineStatus');
 
+  // 监听窗口大小变化以重新计算[card]的显示高度
+  window.addEventListener('resize', adjustDivHeight);
+  function adjustDivHeight() {
+    var $card = $(".card");
+    $card.attr("height", window.innerHeight + 'px');
+  }
+
+  // 按键触发监听
   $messageInput.on("keypress", function (event) {
     if (event.key === "Enter") {
       $sendButton.trigger('click');
       event.preventDefault();
+    }
+  });
+
+  // 监听移动设备键盘弹出事件
+  window.addEventListener('resize', function () {
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') {
+      // 在输入状态时调整 div 高度
+      adjustDivHeight();
     }
   });
 
@@ -23,6 +40,12 @@
 
 
   $sendButton.on("click", function () {
+
+    if ($icon.hasClass('offline')) {
+      alert("Tommy 不在线，请稍等.");
+      return;
+    }
+
     var message = $messageInput.val().trim();
 
     if (message !== "") {
@@ -95,8 +118,39 @@
     }
   });
 
+  // api连接测试
+  testCall();
+
+  // 每 2 分钟检测api连接状态
+  setInterval(testCall, 20000);
 
 });
+
+
+// api连接测试并修改机器人在线状态
+function testCall($icon) {
+  // api调用
+  $.ajax({
+    type: "GET",
+    url: "/Home/TryGPT",
+    data: null,
+    success: function (data) {
+      var $icon = $('#onlineStatus');
+      if (!/^2\d{2}$/.test(data.statusCode)) {
+        $icon.removeClass('online_icon');
+        $icon.addClass('offline');
+      } else {
+        $icon.removeClass('offline');
+        $icon.addClass('online_icon');
+      }
+    },
+    error: function () {
+      alert("出现错误,请重试");
+      $('.online_icon').addClass('offline');
+    }
+  });
+}
+
 
 // 开始打印字符串
 function printString(content, $message, $chatBox) {
