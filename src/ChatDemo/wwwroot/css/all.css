@@ -1,9 +1,10 @@
 ﻿body, html {
-    height: 100%;
+    height: 100vh;
     margin: 0;
     background: #7F7FD5;
     background: -webkit-linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
     background: linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5);
+    overflow: auto;
 }
 
 .chat {
@@ -12,7 +13,12 @@
 }
 
 .card {
-    height: 500px;
+    /*height: 600px;*/
+    position: absolute;
+    top: 10px;
+    bottom: 10px;
+    left: 15px;
+    right: 15px;
     border-radius: 15px !important;
     background-color: rgba(0,0,0,0.4) !important;
 }
@@ -140,7 +146,14 @@
 }
 
 .offline {
-    background-color: #c23616 !important;
+    position: absolute;
+    height: 15px;
+    width: 15px;
+    background-color: darkgray;
+    border-radius: 50%;
+    bottom: 0.2em;
+    right: 0.4em;
+    border: 1.5px solid white;
 }
 
 .user_info {
@@ -252,6 +265,11 @@
                 cursor: pointer;
                 background-color: rgba(0,0,0,0.2);
             }
+
+.input-group-text {
+    height: 60px;
+}
+
 
 @media(max-width: 576px) {
     .contacts_card {
