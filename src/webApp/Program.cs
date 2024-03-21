@@ -1,4 +1,5 @@
-﻿using HomeChatGPT.Configuration;
+﻿using ChatGPT.Net.DTO.ChatGPT;
+using HomeChatGPT.Configuration;
 using HomeChatGPT.Utils;
 using Spectre.Console;
 using System.Data;
@@ -56,6 +57,10 @@ void ConfigureConfiguration()
         .Build();
     // 将配置添加到服务中
     builder.Services.AddSingleton<IConfiguration>(configuration);
+
+    // openai api 參數對象化
+    builder.Services.Configure<ChatGptOptions>(builder.Configuration.GetSection("ChatGptOptions"));
+
 }
 
 

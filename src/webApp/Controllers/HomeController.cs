@@ -1,17 +1,21 @@
-﻿using HomeChatGPT.Utils;
+﻿using ChatGPT.Net.DTO.ChatGPT;
+using HomeChatGPT.Utils;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 
 namespace HomeChatGPT.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ChatGptOptions _option;
         private readonly IConfiguration _configuration;
         private readonly string _apiKey;
 
-        public HomeController(IConfiguration configuration)
+        public HomeController(IConfiguration configuration, IOptions<ChatGptOptions> options)
         {
             this._configuration = configuration;
+            this._option = options.Value;
 
             var collections = _configuration.AsEnumerable();
 
@@ -40,7 +44,7 @@ namespace HomeChatGPT.Controllers
         [HttpGet]
         public async Task<IActionResult> TryGPT()
         {
-            var chatGPTApiClient = new ChatGPTApiClient(this._apiKey);
+            var chatGPTApiClient = new ChatGPTApiClient(this._apiKey, this._option);
             var statusCode = await chatGPTApiClient.TryAskAsync();
 
             var responseObject = new { statusCode = (int)statusCode };
@@ -51,7 +55,7 @@ namespace HomeChatGPT.Controllers
 
         private async Task<(string question, string answer)> CallChatGPTAPI(string input)
         {
-            var chatGPTApiClient = new ChatGPTApiClient(this._apiKey);
+            var chatGPTApiClient = new ChatGPTApiClient(this._apiKey, this._option);
 
             string responseData = await chatGPTApiClient.ChatAsync(input);
 
