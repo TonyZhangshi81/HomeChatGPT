@@ -364,3 +364,13 @@ FodyWeavers.xsd
 
 /src/ChatDemo/wwwroot/lib
 /src/webApp/wwwroot/lib
+
+/tools/nginx-1.24.0/logs/*
+!/tools/nginx-1.24.0/logs/.gitkeep
+
+/tools/nginx-1.24.0/ssl/*
+!/tools/nginx-1.24.0/ssl/.gitkeep
+
+/tools/nginx-1.24.0/temp/*
+!/tools/nginx-1.24.0/temp/.gitkeep
+/src/tye-app/.tye/process_store
