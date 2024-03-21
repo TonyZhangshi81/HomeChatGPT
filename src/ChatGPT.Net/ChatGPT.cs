@@ -215,7 +215,7 @@ public class ChatGpt
             }
             return response.StatusCode;
         }
-        catch (Exception ex)
+        catch
         {
             return HttpStatusCode.BadGateway;
         }

@@ -31,7 +31,6 @@
     } else {
       // 执行输入法面板隐藏时的操作
       $('html, body').animate({ scrollTop: 0 }, 80);
-
       adjustDivHeight();
     }
   });
@@ -57,6 +56,10 @@
     event.preventDefault();
   }, { passive: false });
 
+  // 停止打印文字信息
+  $("body").on("click", "span.noPrint", function () {
+    printIsStop = true;
+  });
 
   $sendButton.on("click", function () {
 
@@ -72,8 +75,7 @@
 
       const messageData = {
         content: message,
-        // TODO 时间需要更新
-        time: '8:40 AM, Today',
+        time: formatAMPM(),
         avatarSrc: '/img/_M.jpg'
       };
 
@@ -104,8 +106,7 @@
 
           const answerData = {
             content: data.answer,
-            // TODO 时间需要更新
-            time: '8:40 AM, Today',
+            time: formatAMPM(),
             avatarSrc: '/img/_D.jpg'
           };
 
@@ -115,10 +116,11 @@
           const $imgContainer = $('<div>', { class: 'msg_cotainer' });
           const $message = $('<span>').text('');
           const $time = $('<span>', { class: 'msg_time' }).text(answerData.time);
+          const $noPrint = $('<span>', { class: 'noPrint' }).text("STOP");
 
           // 应答信息显示
           $msgContent.append($avatar);
-          $imgContainer.append($message, $time);
+          $imgContainer.append($message, $time, $noPrint);
           $msgContainer.append($msgContent, $imgContainer);
 
           // 将创建的元素追加到页面上合适的位置
@@ -137,17 +139,45 @@
     }
   });
 
-  // api连接测试
-  testCall();
+  const isStop = true;
+  if (isStop) {
+    $icon.removeClass('offline');
+    $icon.addClass('online_icon');
+  } else {
+    // api连接测试
+    testCall();
+    // 每 5 分钟检测api连接状态
+    setInterval(testCall, 50000);
+  }
 
-  // 每 5 分钟检测api连接状态
-  setInterval(testCall, 50000);
-
+  if (1 == 2) {
+    // 测试用代码
+    testInit("如果您发现在执行 $('html, body').animate({ scrollTop: 0 }, 80); 后导致画面尺寸放大，可能有几种可能性需要考虑："
+      + "CSS动画效果导致的尺寸变化：该动画可能会改变页面的布局或者尺寸，导致内容被放大。您可以检查相关的CSS样式，确保动画效果不会改变页面尺寸。"
+      + "jQuery动画函数引发的问题：在某些情况下，jQuery的动画函数可能会导致页面尺寸变化。您可以尝试调整动画的参数或者使用其他方式来实现所需的效果。"
+      + "事件处理函数的影响：如果该动画是作为事件处理函数的一部分执行的，可能是事件本身导致了页面尺寸变化。确保事件处理函数没有意外的副作用。"
+      + "为了解决这个问题，您可以尝试以下方法：检查动画代码，确保它不会直接或间接地改变页面尺寸。如果可能的话，尝试使用原生JavaScript代替jQuery来执行动画，"
+      + "看是否仍然出现同样的问题。如果您确定问题是由于动画效果导致的，可以尝试调整动画的参数或者更改实现方式。在动画执行之后，使用调试工具检查页面元素和样式，"
+      + "查看是否有任何意外的变化发生。通过仔细检查代码并排除可能的原因，您应该能够解决这个问题。如果您发现在执行 $('html, body').animate({ scrollTop: 0 }, 80); "
+      + "后导致画面尺寸放大，可能有几种可能性需要考虑：CSS动画效果导致的尺寸变化：该动画可能会改变页面的布局或者尺寸，导致内容被放大。您可以检查相关的CSS样式，"
+      + "确保动画效果不会改变页面尺寸。jQuery动画函数引发的问题：在某些情况下，jQuery的动画函数可能会导致页面尺寸变化。"
+      + "您可以尝试调整动画的参数或者使用其他方式来实现所需的效果。事件处理函数的影响：如果该动画是作为事件处理函数的一部分执行的，可能是事件本身导致了页面尺寸变化。"
+      + "确保事件处理函数没有意外的副作用。为了解决这个问题，您可以尝试以下方法：检查动画代码，确保它不会直接或间接地改变页面尺寸。如果可能的话，"
+      + "尝试使用原生JavaScript代替jQuery来执行动画，看是否仍然出现同样的问题。如果您确定问题是由于动画效果导致的，可以尝试调整动画的参数或者更改实现方式。"
+      + "在动画执行之后，使用调试工具检查页面元素和样式，查看是否有任何意外的变化发生。通过仔细检查代码并排除可能的原因，您应该能够解决这个问题。"
+      + "如果您发现在执行 $('html, body').animate({ scrollTop: 0 }, 80); 后导致画面尺寸放大，可能有几种可能性需要考虑：CSS动画效果导致的尺寸变化："
+      + "该动画可能会改变页面的布局或者尺寸，导致内容被放大。您可以检查相关的CSS样式，确保动画效果不会改变页面尺寸。jQuery动画函数引发的问题："
+      + "在某些情况下，jQuery的动画函数可能会导致页面尺寸变化。您可以尝试调整动画的参数或者使用其他方式来实现所需的效果。事件处理函数的影响："
+      + "如果该动画是作为事件处理函数的一部分执行的，可能是事件本身导致了页面尺寸变化。确保事件处理函数没有意外的副作用。为了解决这个问题，您可以尝试以下方法："
+      + "检查动画代码，确保它不会直接或间接地改变页面尺寸。如果可能的话，尝试使用原生JavaScript代替jQuery来执行动画，看是否仍然出现同样的问题。"
+      + "如果您确定问题是由于动画效果导致的，可以尝试调整动画的参数或者更改实现方式。在动画执行之后，使用调试工具检查页面元素和样式，查看是否有任何意外的变化发生。"
+      + "通过仔细检查代码并排除可能的原因，您应该能够解决这个问题。");
+  }
 });
 
 
 // api连接测试并修改机器人在线状态
-function testCall($icon) {
+function testCall() {
   // api调用
   $.ajax({
     type: "GET",
@@ -170,11 +200,13 @@ function testCall($icon) {
   });
 }
 
+// 立即停止打印文字
+let printIsStop = false;
 
 // 开始打印字符串
 function printString(content, $message, $chatBox) {
   // 打印字符的时间间隔（毫秒）
-  var interval = 80;
+  var interval = 50;
 
   var index = 0;
   var timer = setInterval(function () {
@@ -186,9 +218,54 @@ function printString(content, $message, $chatBox) {
     $chatBox.scrollTop($chatBox[0].scrollHeight);
 
     // 如果所有字符都打印完毕，则清除定时器
-    if (index === content.length) {
+    if (index === content.length || printIsStop) {
+      $message.next().next().remove();
       clearInterval(timer);
     }
   }, interval);
 
+}
+
+function formatAMPM() {
+  let date = new Date();
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? '0' + minutes : minutes;
+  let strTime = hours + ':' + minutes + ' ' + ampm;
+  return strTime;
+}
+
+
+function testInit(str) {
+  var $chatBox = $(".card-body");
+
+  const answerData = {
+    content: str,
+    time: formatAMPM(),
+    avatarSrc: '/img/_D.jpg'
+  };
+
+  const $msgContainer = $('<div>', { class: 'd-flex justify-content-start mb-4' });
+  const $msgContent = $('<div>', { class: 'img_cont_msg' });
+  const $avatar = $('<img>', { src: answerData.avatarSrc, class: 'rounded-circle user_img_msg' });
+  const $imgContainer = $('<div>', { class: 'msg_cotainer' });
+  const $message = $('<span>').text('');
+  const $time = $('<span>', { class: 'msg_time' }).text(answerData.time);
+  const $noPrint = $('<span>', { class: 'noPrint' }).text("STOP");
+
+  // 应答信息显示
+  $msgContent.append($avatar);
+  $imgContainer.append($message, $time, $noPrint);
+  $msgContainer.append($msgContent, $imgContainer);
+
+  // 将创建的元素追加到页面上合适的位置
+  $chatBox.append($msgContainer);
+  // 滚动条移动至最后位置
+  $chatBox.scrollTop($chatBox[0].scrollHeight);
+
+  // 文字打印
+  printString(answerData.content, $message, $chatBox);
 }
