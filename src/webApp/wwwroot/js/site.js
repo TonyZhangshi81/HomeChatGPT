@@ -198,6 +198,7 @@
       // 如果所有字符都打印完毕，则清除定时器
       if (index === content.length || printIsStop) {
         $message.next().next().remove();
+        printIsStop = false;
         clearInterval(timer);
       }
     }, interval);
