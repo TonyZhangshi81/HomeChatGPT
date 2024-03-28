@@ -1,0 +1,9 @@
+version: '3.4'
+
+services:
+  homechatgpt:
+    image: homechatgpt-image
+    container_name: homechatgpt
+    build:
+      context: .
+      dockerfile: webApp\Dockerfile
