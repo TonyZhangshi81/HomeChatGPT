@@ -3,7 +3,7 @@ version: '3.4'
 services:
   homechatgpt:
     image: homechatgpt-image
-    container_name: homechatgpt
+    container_name: go_chatgpt
     build:
       context: .
       dockerfile: webApp\Dockerfile
